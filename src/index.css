@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-white text-gray-800;
+  }
+}
+
+@layer components {
+  .calendar-event {
+    @apply rounded-md p-2 overflow-hidden text-sm;
+  }
+  .mmu-event {
+    @apply bg-blue-100 border-l-4 border-mmu-blue text-mmu-blue;
+  }
+}
