@@ -229,6 +229,9 @@ const CoursesView = () => {
         if (a.date !== b.date) {
           return new Date(a.date) - new Date(b.date);
         }
+        // Add null checks for startTime before using localeCompare
+        if (!a.startTime) return -1;
+        if (!b.startTime) return 1;
         return a.startTime.localeCompare(b.startTime);
       });
   };
