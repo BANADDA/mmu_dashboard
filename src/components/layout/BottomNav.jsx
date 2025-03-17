@@ -40,7 +40,15 @@ const BottomNav = ({ currentView = 'calendar', onViewChange }) => {
           <GraduationCap className="h-5 w-5" />
           <span className="text-[10px] mt-0.5">Courses</span>
         </a>
-        <a href="#" className="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 hover:text-mmu-blue dark:hover:text-blue-400">
+        <a 
+          href="#" 
+          onClick={(e) => { e.preventDefault(); onViewChange('history'); }}
+          className={`flex flex-col items-center justify-center ${
+            currentView === 'history'
+              ? 'text-mmu-blue dark:text-blue-400'
+              : 'text-gray-500 dark:text-gray-400 hover:text-mmu-blue dark:hover:text-blue-400'
+          }`}
+        >
           <History className="h-5 w-5" />
           <span className="text-[10px] mt-0.5">History</span>
         </a>

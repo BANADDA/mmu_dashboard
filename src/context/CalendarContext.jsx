@@ -1,6 +1,7 @@
 import { createContext, useContext, useState } from 'react';
 
-const CalendarContext = createContext();
+// Export the context directly so components can check if it exists
+export const CalendarContext = createContext(null);
 
 export const CalendarProvider = ({ children }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
