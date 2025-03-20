@@ -17,7 +17,8 @@ import { auth, db } from './config';
 // User roles
 export const USER_ROLES = {
   ADMIN: 'admin',
-  LECTURER: 'lecturer'
+  LECTURER: 'lecturer',
+  HOD: 'hod'
 };
 
 /**
@@ -209,6 +210,17 @@ export const isAdmin = (userData) => {
 export const isLecturer = (userData) => {
   const result = userData?.role === USER_ROLES.LECTURER;
   if (userData) console.log(`isLecturer check for ${userData.email}: ${result}`);
+  return result;
+};
+
+/**
+ * Check if a user is Head of Department
+ * @param {object} userData - User data object with role
+ * @returns {boolean} True if user is HOD
+ */
+export const isHOD = (userData) => {
+  const result = userData?.role === USER_ROLES.HOD;
+  if (userData) console.log(`isHOD check for ${userData.email}: ${result}`);
   return result;
 };
 

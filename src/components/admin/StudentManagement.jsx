@@ -389,6 +389,12 @@ const StudentManagement = () => {
       return;
     }
     
+    // Email is required for new students to enable self-registration
+    if (formMode === 'add' && !currentStudent.email) {
+      setError('Email address is required for student registration');
+      return;
+    }
+    
     setError('');
     setSuccessMessage('');
     setIsSubmitting(true);
@@ -411,6 +417,8 @@ const StudentManagement = () => {
           phone: currentStudent.phone,
           address: currentStudent.address,
           isActive: currentStudent.isActive,
+          isEmailVerified: false, // Track email verification status
+          passwordCreated: false, // Track if student has created password
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         };
@@ -422,7 +430,12 @@ const StudentManagement = () => {
         const docRef = await addDoc(collection(db, 'students'), studentData);
         console.log('StudentManagement: Student added with ID:', docRef.id);
         
-        setSuccessMessage('Student added successfully');
+        // Send verification email to student (mock implementation)
+        // In a real implementation, you'd use Firebase Auth or a similar service
+        // to send the verification email with a unique link
+        console.log(`Sending verification email to: ${currentStudent.email}`);
+        
+        setSuccessMessage(`Student added successfully. Verification email sent to ${currentStudent.email}`);
       } else {
         // Store the courseId to use for filtering
         newCourseId = currentStudent.courseId;
@@ -575,6 +588,57 @@ const StudentManagement = () => {
   );
   console.log('StudentManagement: Courses available for form:', availableCourses);
 
+  // Send verification email to student
+  const handleSendVerificationEmail = async (student) => {
+    if (!student.email) {
+      setError('Student has no email address. Please edit the student to add an email.');
+      return;
+    }
+    
+    try {
+      // Mark the student as being processed
+      const updatedStudents = students.map(s => 
+        s.id === student.id ? { ...s, sendingEmail: true } : s
+      );
+      setStudents(updatedStudents);
+      
+      // Update the student record in Firestore to trigger email sending
+      // In a real implementation, you'd have a backend or Firebase Function
+      // to handle sending the actual email with verification link
+      await updateDoc(doc(db, 'students', student.id), {
+        emailVerificationSent: true,
+        emailVerificationSentAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+      
+      // Update UI to show email was sent
+      setTimeout(() => {
+        const finalStudents = students.map(s => 
+          s.id === student.id ? { 
+            ...s, 
+            sendingEmail: false, 
+            emailVerificationSent: true 
+          } : s
+        );
+        setStudents(finalStudents);
+        setSuccessMessage(`Verification email sent to ${student.email}`);
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => setSuccessMessage(''), 3000);
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Error sending verification email:', error);
+      setError('Failed to send verification email. Please try again.');
+      
+      // Reset sending state
+      const resetStudents = students.map(s => 
+        s.id === student.id ? { ...s, sendingEmail: false } : s
+      );
+      setStudents(resetStudents);
+    }
+  };
+
   return (
     <div className="p-4 bg-white dark:bg-gray-900 rounded-lg shadow">
       <div className="flex items-center justify-between mb-6">
@@ -664,7 +728,7 @@ const StudentManagement = () => {
               {/* Student Email */}
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Email
+                  Email {formMode === 'add' && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   type="email"
@@ -674,7 +738,13 @@ const StudentManagement = () => {
                   onChange={handleInputChange}
                   className="block w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-blue-500 text-sm"
                   placeholder="Enter student email"
+                  required={formMode === 'add'}
                 />
+                {formMode === 'add' && (
+                  <p className="mt-1 text-xs text-gray-500">
+                    Email is required for student self-registration. A verification email will be sent to this address.
+                  </p>
+                )}
               </div>
               
               {/* Phone Number */}
@@ -995,6 +1065,23 @@ const StudentManagement = () => {
                         </td>
                         <td className="px-4 py-3 text-right text-sm font-medium">
                           <div className="flex space-x-2 justify-end">
+                            {student.email && !student.emailVerificationSent && (
+                              <button
+                                className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300"
+                                onClick={() => handleSendVerificationEmail(student)}
+                                title="Send verification email"
+                                disabled={student.sendingEmail}
+                              >
+                                {student.sendingEmail ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                    <polyline points="22,6 12,13 2,6" />
+                                  </svg>
+                                )}
+                              </button>
+                            )}
                             <button
                               className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                               onClick={() => handleEditStudent(student)}

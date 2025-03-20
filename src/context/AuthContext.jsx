@@ -1,6 +1,6 @@
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { isAdmin, isLecturer, loginUser, logoutUser, onAuthStateChange, registerUser, USER_ROLES } from '../firebase/auth';
+import { isAdmin, isHOD, isLecturer, loginUser, logoutUser, onAuthStateChange, registerUser, USER_ROLES } from '../firebase/auth';
 import { db } from '../firebase/config';
 
 // Create the auth context
@@ -198,6 +198,7 @@ export const AuthProvider = ({ children }) => {
   // Check user roles
   const userIsAdmin = isAdmin(user);
   const userIsLecturer = isLecturer(user);
+  const userIsHOD = isHOD(user);
 
   // Debug
   useEffect(() => {
@@ -207,9 +208,10 @@ export const AuthProvider = ({ children }) => {
       user: user ? { uid: user.uid, email: user.email, role: user.role } : null,
       userIsAdmin,
       userIsLecturer,
+      userIsHOD,
       hasAdminCredentials: !!adminCredentialsRef.current
     });
-  }, [isAuthenticated, isLoading, user, userIsAdmin, userIsLecturer]);
+  }, [isAuthenticated, isLoading, user, userIsAdmin, userIsLecturer, userIsHOD]);
 
   // Context value
   const value = {
@@ -221,6 +223,7 @@ export const AuthProvider = ({ children }) => {
     authError,
     userIsAdmin,
     userIsLecturer,
+    userIsHOD,
     userRoles: USER_ROLES,
     createInitialAdmin,
     isCreatingAdmin,

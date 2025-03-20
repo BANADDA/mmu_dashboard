@@ -52,7 +52,22 @@ const DepartmentManagement = () => {
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setCurrentDepartment(prev => ({ ...prev, [name]: value }));
+    
+    // If updating department code, enforce MOU- format
+    if (name === 'code') {
+      // Ensure code starts with MOU-
+      let formattedCode = value;
+      if (!value.startsWith('MOU-') && value.length > 0) {
+        formattedCode = `MOU-${value.replace('MOU-', '')}`;
+      }
+      
+      // Convert to uppercase
+      formattedCode = formattedCode.toUpperCase();
+      
+      setCurrentDepartment(prev => ({ ...prev, [name]: formattedCode }));
+    } else {
+      setCurrentDepartment(prev => ({ ...prev, [name]: value }));
+    }
   };
   
   // Reset form
@@ -93,6 +108,12 @@ const DepartmentManagement = () => {
     // Form validation
     if (!currentDepartment.name || !currentDepartment.code) {
       setError('Department name and code are required');
+      return;
+    }
+    
+    // Validate department code format
+    if (!currentDepartment.code.startsWith('MOU-')) {
+      setError('Department code must start with MOU-');
       return;
     }
     
@@ -244,9 +265,12 @@ const DepartmentManagement = () => {
                   value={currentDepartment.code}
                   onChange={handleInputChange}
                   className="block w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-blue-500 text-sm"
-                  placeholder="Enter department code (e.g. CS, ENG)"
+                  placeholder="MOU-CS (e.g. for Computer Science)"
                   required
                 />
+                <p className="mt-1 text-xs text-gray-500">
+                  Code must start with MOU- followed by department abbreviation
+                </p>
               </div>
             </div>
             

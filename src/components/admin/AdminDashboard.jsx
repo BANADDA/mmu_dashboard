@@ -1,22 +1,20 @@
 import {
     BookOpen,
+    BookText,
     Building2,
-    Calendar,
+    GraduationCap,
     Home,
     Menu,
-    Settings,
     Users
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Header from '../layout/Header';
 import Sidebar from '../layout/Sidebar';
-import AccountManagement from './AccountManagement';
 import CourseManagement from './CourseManagement';
 import DashboardHome from './DashboardHome';
 import DepartmentManagement from './DepartmentManagement';
-import LectureAssignment from './LectureAssignment';
-import LectureManagement from './LectureManagement';
+import ProgramManagement from './ProgramManagement';
 import StudentManagement from './StudentManagement';
 import UserManagement from './UserManagement';
 
@@ -33,13 +31,11 @@ const AdminDashboard = () => {
 
   const tabs = [
     { id: 'home', label: 'Dashboard', icon: <Home className="h-5 w-5" /> },
-    { id: 'users', label: 'Users', icon: <Users className="h-5 w-5" /> },
-    { id: 'departments', label: 'Departments', icon: <Building2 className="h-5 w-5" /> },
-    { id: 'courses', label: 'Courses', icon: <BookOpen className="h-5 w-5" /> },
-    { id: 'lectures', label: 'Lectures', icon: <Calendar className="h-5 w-5" /> },
-    { id: 'lecture-assignment', label: 'Lecture Assignment', icon: <Calendar className="h-5 w-5" /> },
-    { id: 'students', label: 'Students', icon: <Users className="h-5 w-5" /> },
-    { id: 'account', label: 'Account Settings', icon: <Settings className="h-5 w-5" /> },
+    { id: 'users', label: 'User Management', icon: <Users className="h-5 w-5" /> },
+    { id: 'departments', label: 'Department Management', icon: <Building2 className="h-5 w-5" /> },
+    { id: 'programs', label: 'Program Management', icon: <BookOpen className="h-5 w-5" /> },
+    { id: 'courses', label: 'Course Management', icon: <BookText className="h-5 w-5" /> },
+    { id: 'students', label: 'Student Management', icon: <GraduationCap className="h-5 w-5" /> },
   ];
 
   const handleTabChange = (tabId) => {
@@ -58,16 +54,12 @@ const AdminDashboard = () => {
         return <UserManagement />;
       case 'departments':
         return <DepartmentManagement />;
+      case 'programs':
+        return <ProgramManagement />;
       case 'courses':
         return <CourseManagement />;
-      case 'lectures':
-        return <LectureManagement />;
-      case 'lecture-assignment':
-        return <LectureAssignment />;
       case 'students':
         return <StudentManagement />;
-      case 'account':
-        return <AccountManagement />;
       default:
         return <DashboardHome />;
     }
